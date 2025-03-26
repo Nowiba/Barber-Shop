@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" id="htmlElement">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>لوحة تحكم الحلاق</title>
+  <link rel="stylesheet" href="admin.css">
+
+  
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+</head>
+<body>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast" style="display: none;">
+    <i class="fas fa-check-circle toast-icon"></i>
+    <span id="toastMessage"></span>
+    <button class="toast-close">&times;</button>
+  </div>
+
+  <!-- Main Content -->
+  <main class="admin-main">
+    
+    <!-- Set Working Hours Section -->
+    <section id="setWorkingHours">
+      <h2 data-i18n="working_hours">ساعات العمل</h2>
+      <div class="working-hours-form">
+        <label for="workDate" data-i18n="select_date">اختر التاريخ</label>
+        <input type="date" id="workDate" name="workDate" required>
+
+        <label for="workStartTime" data-i18n="start_time">وقت البدء</label>
+        <input type="time" id="workStartTime" name="workStartTime" min="08:00" max="23:45" step="900" list="times">
+
+        <label for="workEndTime" data-i18n="end_time">وقت الانتهاء</label>
+        <input type="time" id="workEndTime" name="workEndTime" min="08:00" max="23:45" step="900" list="times">
+
+        <button type="button" id="saveWorkHours" data-i18n="save_hours">حفظ الساعات</button>
+      </div>
+    </section>
+
+    <!-- Optional Break Time Section -->
+    <section id="breakTimeSection">
+      <h2 data-i18n="break_time">وقت الراحة</h2>
+      <div class="break-time-form">
+        <label for="breakStartTime" data-i18n="break_start">بداية الراحة</label>
+        <input type="time" id="breakStartTime" name="breakStartTime" min="08:00" max="23:45" step="900" list="times">
+
+        <label for="breakEndTime" data-i18n="break_end">نهاية الراحة</label>
+        <input type="time" id="breakEndTime" name="breakEndTime" min="08:00" max="23:45" step="900" list="times">
+        
+        
+
+        <button type="button" id="registerBreakTime" data-i18n="register_break">تسجيل وقت الراحة</button>
+      </div>
+    </section>
+
+    <!-- Manage Appointments Section -->
+    <section id="appointments">
+      <h2 data-i18n="appointments">المواعيد</h2>
+      <div class="appointments-list">
+        <ul id="appointmentsList">
+          <!-- Appointments will be dynamically added here -->
+        </ul>
+      </div>
+    </section>
+
+    <!-- Publish Story Section -->
+    <section id="publishStory">
+      <h2 data-i18n="publish_story">النشر</h2>
+      <textarea id="storyContent" data-i18n-placeholder="story_placeholder" placeholder="اكتب شيئًا للنشر..."></textarea>
+      <button type="button" id="publishStoryBtn" data-i18n="publish">نشر</button>
+    </section>
+  </main>
+
+  <!-- Bottom Navigation -->
+  <nav class="admin-navbar">
+    <ul class="admin-nav-list">
+      <li class="admin-nav-item">
+        <a href="#setWorkingHours" class="admin-nav-link">
+          <i class="fas fa-clock"></i>
+          <span data-i18n="working_hours">ساعات العمل</span>
+        </a>
+      </li>
+      <li class="admin-nav-item">
+        <a href="#appointments" class="admin-nav-link">
+          <i class="fas fa-calendar-alt"></i>
+          <span data-i18n="appointments">المواعيد</span>
+        </a>
+      </li>
+      <li class="admin-nav-item">
+        <a href="#publishStory" class="admin-nav-link">
+          <i class="fas fa-newspaper"></i>
+          <span data-i18n="publish_story">النشر</span>
+        </a>
+      </li>
+      <li class="admin-nav-item">
+        <button class="language-btn" id="languageToggle">
+          <i class="fas fa-globe"></i>
+          <span>FR</span>
+        </button>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Time options for 15-minute intervals -->
+  <datalist id="times">
+    <option value="08:00"></option>
+    <option value="08:15"></option>
+    <option value="08:30"></option>
+    <option value="08:45"></option>
+    <option value="09:00"></option>
+    <option value="09:15"></option>
+    <option value="09:30"></option>
+    <option value="09:45"></option>
+    <option value="10:00"></option>
+    <option value="10:15"></option>
+    <option value="10:30"></option>
+    <option value="10:45"></option>
+    <option value="11:00"></option>
+    <option value="11:15"></option>
+    <option value="11:30"></option>
+    <option value="11:45"></option>
+    <option value="12:00"></option>
+    <option value="12:15"></option>
+    <option value="12:30"></option>
+    <option value="12:45"></option>
+    <option value="13:00"></option>
+    <option value="13:15"></option>
+    <option value="13:30"></option>
+    <option value="13:45"></option>
+    <option value="14:00"></option>
+    <option value="14:15"></option>
+    <option value="14:30"></option>
+    <option value="14:45"></option>
+    <option value="15:00"></option>
+    <option value="15:15"></option>
+    <option value="15:30"></option>
+    <option value="15:45"></option>
+    <option value="16:00"></option>
+    <option value="16:15"></option>
+    <option value="16:30"></option>
+    <option value="16:45"></option>
+    <option value="17:00"></option>
+    <option value="17:15"></option>
+    <option value="17:30"></option>
+    <option value="17:45"></option>
+    <option value="18:00"></option>
+    <option value="18:15"></option>
+    <option value="18:30"></option>
+    <option value="18:45"></option>
+    <option value="19:00"></option>
+    <option value="19:15"></option>
+    <option value="19:30"></option>
+    <option value="19:45"></option>
+    <option value="20:00"></option>
+    <option value="20:15"></option>
+    <option value="20:30"></option>
+    <option value="20:45"></option>
+    <option value="21:00"></option>
+    <option value="21:15"></option>
+    <option value="21:30"></option>
+    <option value="21:45"></option>
+    <option value="22:00"></option>
+    <option value="22:15"></option>
+    <option value="22:30"></option>
+    <option value="22:45"></option>
+    <option value="23:00"></option>
+    <option value="23:15"></option>
+    <option value="23:30"></option>
+    <option value="23:45"></option>
+  </datalist>
+
+  <script>
+    // Firebase Configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyDybRqjXB0GeXbhBhk_TUryxRku0ZsT78Q",
+      authDomain: "barber-ftw.firebaseapp.com",
+      databaseURL: "https://barber-ftw-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "barber-ftw",
+      storageBucket: "barber-ftw.firebasestorage.app",
+      messagingSenderId: "340946820967",
+      appId: "1:340946820967:web:d8b130c852efd5eb0559c2"
+    };
+
+    // Initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    // Toast Notification System
+    function showToast(message, type = 'info', duration = 3000) {
+      const toast = document.getElementById('toast');
+      const toastMessage = document.getElementById('toastMessage');
+      const toastIcon = toast.querySelector('.toast-icon');
+      
+      // Set icon based on type
+      let iconClass;
+      switch(type) {
+        case 'success':
+          iconClass = 'fa-check-circle';
+          break;
+        case 'error':
+          iconClass = 'fa-exclamation-circle';
+          break;
+        case 'info':
+          iconClass = 'fa-info-circle';
+          break;
+        default:
+          iconClass = 'fa-info-circle';
+      }
+      
+      // Update icon
+      toastIcon.className = `fas ${iconClass} toast-icon`;
+      
+      toast.className = `toast ${type}`;
+      toastMessage.textContent = message;
+      toast.style.display = 'flex';
+      
+      setTimeout(() => {
+        toast.classList.add('show');
+      }, 10);
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => {
+          toast.style.display = 'none';
+        }, 300);
+      }, duration);
+      
+      // Close button
+      document.querySelector('.toast-close').onclick = () => {
+        toast.classList.remove('show');
+        setTimeout(() => {
+          toast.style.display = 'none';
+        }, 300);
+      };
+    }
+
+    // Language Management
+    const translations = {
+      ar: {
+        "working_hours": "ساعات العمل",
+        "appointments": "المواعيد",
+        "publish_story": "النشر",
+        "language": "FR",
+        "select_date": "اختر التاريخ",
+        "start_time": "وقت البدء",
+        "end_time": "وقت الانتهاء",
+        "save_hours": "حفظ الساعات",
+        "break_time": "وقت الراحة",
+        "break_start": "بداية الراحة",
+        "break_end": "نهاية الراحة",
+        "register_break": "تسجيل وقت الراحة",
+        "story_placeholder": "اكتب شيئًا للنشر...",
+        "publish": "نشر",
+        "confirm": "تأكيد",
+        "exit": "خروج",
+        "hours_saved": "تم حفظ ساعات العمل بنجاح!",
+        "break_saved": "تم تسجيل وقت الراحة بنجاح!",
+        "story_published": "تم النشر بنجاح!",
+        "appointment_cancelled": "تم إلغاء الموعد بنجاح!",
+        "error": "خطأ",
+        "no_appointments": "لا توجد مواعيد",
+        "appointment_date": "التاريخ",
+        "client": "العميل",
+        "appointment_time": "الوقت"
+      },
+      fr: {
+        "working_hours": "Heures de travail",
+        "appointments": "Rendez-vous",
+        "publish_story": "Publication",
+        "language": "AR",
+        "select_date": "Sélectionner une date",
+        "start_time": "Heure de début",
+        "end_time": "Heure de fin",
+        "save_hours": "Enregistrer les heures",
+        "break_time": "Pause",
+        "break_start": "Début de pause",
+        "break_end": "Fin de pause",
+        "register_break": "Enregistrer la pause",
+        "story_placeholder": "Écrivez quelque chose à publier...",
+        "publish": "Publier",
+        "confirm": "Confirmer",
+        "exit": "Quitter",
+        "hours_saved": "Heures de travail enregistrées avec succès!",
+        "break_saved": "Pause enregistrée avec succès!",
+        "story_published": "Publication réussie!",
+        "appointment_cancelled": "Rendez-vous annulé avec succès!",
+        "error": "Erreur",
+        "no_appointments": "Aucun rendez-vous",
+        "appointment_date": "Date",
+        "client": "Client",
+        "appointment_time": "Heure"
+      }
+    };
+
+    // Language Functions using localStorage
+    function updateLanguage(lang) {
+      // Set HTML attributes
+      document.documentElement.lang = lang;
+      document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+      
+      // Update UI texts
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        el.textContent = translations[lang][key] || '';
+      });
+      
+      // Update placeholders
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        el.placeholder = translations[lang][key] || '';
+      });
+      
+      // Update button text
+      document.querySelector('#languageToggle span').textContent = lang === 'ar' ? 'FR' : 'AR';
+      
+      // Save preference to localStorage
+      localStorage.setItem('adminLang', lang);
+    }
+
+    // Initialize Language from localStorage
+    const savedLang = localStorage.getItem('adminLang') || 'ar';
+    updateLanguage(savedLang);
+
+    // Language Toggle
+    document.getElementById('languageToggle').addEventListener('click', (e) => {
+      e.preventDefault();
+      const currentLang = document.documentElement.lang;
+      const newLang = currentLang === 'ar' ? 'fr' : 'ar';
+      updateLanguage(newLang);
+    });
+
+    // Set Date Limits (today + 4 days)
+    function setDateLimits() {
+      const today = new Date();
+      const maxDate = new Date();
+      maxDate.setDate(today.getDate() + 4);
+      
+      const dateInput = document.getElementById('workDate');
+      dateInput.min = today.toISOString().split('T')[0];
+      dateInput.max = maxDate.toISOString().split('T')[0];
+      dateInput.value = today.toISOString().split('T')[0];
+      
+      // Prevent manual input
+      dateInput.addEventListener('keydown', (e) => {
+        e.preventDefault();
+        return false;
+      });
+      
+      // Make the calendar picker cover the entire input
+      dateInput.addEventListener('focus', function() {
+        this.showPicker();
+      });
+    }
+    setDateLimits();
+
+    // Force 15-minute intervals on time inputs
+    document.querySelectorAll('input[type="time"]').forEach(input => {
+      input.addEventListener('change', function() {
+        if (!this.value) return;
+        
+        const [hours, minutes] = this.value.split(':');
+        const roundedMinutes = Math.round(minutes / 15) * 15;
+        const adjustedHours = roundedMinutes === 60 ? parseInt(hours) + 1 : hours;
+        const finalMinutes = roundedMinutes === 60 ? '00' : roundedMinutes.toString().padStart(2, '0');
+        
+        this.value = `${adjustedHours.toString().padStart(2, '0')}:${finalMinutes}`;
+      });
+    });
+
+    // Save Working Hours
+    document.getElementById('saveWorkHours').addEventListener('click', function() {
+      const workDate = document.getElementById('workDate').value;
+      const workStartTime = document.getElementById('workStartTime').value;
+      const workEndTime = document.getElementById('workEndTime').value;
+
+      if (!workStartTime || !workEndTime) {
+        showToast(translations[document.documentElement.lang]['break_optional'], 'error');
+        return;
+      }
+
+      database.ref('workingHours').child(workDate).set({
+        workStartTime,
+        workEndTime
+      }).then(() => {
+        showToast(translations[document.documentElement.lang]['hours_saved'], 'success');
+      }).catch(error => {
+        showToast(`${translations[document.documentElement.lang]['error']}: ${error.message}`, 'error');
+      });
+    });
+
+    // Register Break Time
+    document.getElementById('registerBreakTime').addEventListener('click', function() {
+      const date = document.getElementById('workDate').value;
+      const start = document.getElementById('breakStartTime').value;
+      const end = document.getElementById('breakEndTime').value;
+      
+      if (!start || !end) {
+        showToast(translations[document.documentElement.lang]['break_optional'], 'info');
+        return;
+      }
+
+      // Remove existing breaks for this date
+      database.ref('breakTimes').orderByChild('date').equalTo(date).once('value', snapshot => {
+        const updates = {};
+        snapshot.forEach(breakRef => {
+          updates[breakRef.key] = null;
+        });
+        
+        // Add new break
+        database.ref('breakTimes').update(updates).then(() => {
+          return database.ref('breakTimes').push({
+            date,
+            breakStartTime: start,
+            breakEndTime: end
+          });
+        }).then(() => {
+          showToast(translations[document.documentElement.lang]['break_saved'], 'success');
+          document.getElementById('breakStartTime').value = '';
+          document.getElementById('breakEndTime').value = '';
+        }).catch(error => {
+          showToast(`${translations[document.documentElement.lang]['error']}: ${error.message}`, 'error');
+        });
+      });
+    });
+// Fixed Load Appointments function
+database.ref('appointments').on('value', snapshot => {
+  const appointmentsList = document.getElementById('appointmentsList');
+  appointmentsList.innerHTML = '';
+  
+  if (!snapshot.exists()) {
+    const noAppointments = document.createElement('li');
+    noAppointments.textContent = translations[document.documentElement.lang]['no_appointments'];
+    appointmentsList.appendChild(noAppointments);
+    return;
+  }
+  
+  // Collect all appointments
+  const allAppointments = [];
+  
+  snapshot.forEach(dateSnapshot => {
+    const date = dateSnapshot.key;
+    
+    dateSnapshot.forEach(appointmentSnapshot => {
+      const appointment = appointmentSnapshot.val();
+      const status = appointment.status || 'booked';
+      
+      // Skip cancelled appointments
+      if (status === 'cancelled') return;
+      
+      // Extract time from appointmentTime (format: "2025-03-26 18:00")
+      const timeParts = appointment.appointmentTime.split(' ');
+      const time = timeParts.length > 1 ? timeParts[1] : '';
+      
+      // Convert to 12-hour format with AM/PM
+      let displayTime = '';
+      if (time) {
+        const [hours, minutes] = time.split(':');
+        const hourNum = parseInt(hours);
+        const period = hourNum >= 12 ? 'PM' : 'AM';
+        const displayHour = hourNum % 12 || 12;
+        displayTime = `${displayHour}:${minutes} ${period}`;
+      }
+      
+      allAppointments.push({
+        date,
+        fullName: appointment.fullName,
+        time: displayTime,
+        status
+      });
+    });
+  });
+  
+  // Sort appointments by date then by time
+  allAppointments.sort((a, b) => {
+    if (a.date === b.date) {
+      return a.time.localeCompare(b.time);
+    }
+    return a.date.localeCompare(b.date);
+  });
+  
+  // Display all appointments in the requested format
+  allAppointments.forEach(appt => {
+    const li = document.createElement('li');
+    li.innerHTML = `
+      <div class="appointment-info">
+        <span>${appt.date}</span>
+        <span>${appt.fullName}</span>
+        <span>${appt.time}</span>
+        <span class="status-${appt.status}">${appt.status}</span>
+      </div>
+    `;
+    appointmentsList.appendChild(li);
+  });
+});
+    // Publish Story (24-hour expiration)
+// In your ADMIN page script
+document.getElementById('publishStoryBtn').addEventListener('click', function() {
+  const content = document.getElementById('storyContent').value.trim();
+  
+  if (!content) {
+    showToast('Please enter story content', 'error');
+    return;
+  }
+  
+  const now = Date.now();
+  const expirationTime = now + (24 * 60 * 60 * 1000); // 24 hours from now
+  
+  database.ref('stories').push({
+    content: content,
+    timestamp: now,
+    expiration: expirationTime,
+    isActive: true
+  }).then(() => {
+    showToast('Story published successfully!', 'success');
+    document.getElementById('storyContent').value = '';
+  }).catch(error => {
+    showToast('Publish failed: ' + error.message, 'error');
+  });
+});
+  </script>
+    <script>// Add this to admin page to clean up expired stories
+      function cleanUpExpiredStories() {
+        const now = new Date().getTime();
+        
+        database.ref('stories').once('value', snapshot => {
+          const updates = {};
+          
+          snapshot.forEach(storySnapshot => {
+            const story = storySnapshot.val();
+            if (story.expiration < now) {
+              updates[storySnapshot.key] = null; // Mark for deletion
+            }
+          });
+          
+          if (Object.keys(updates).length > 0) {
+            database.ref('stories').update(updates);
+          }
+        });
+      }
+      
+      // Run cleanup every hour
+      cleanUpExpiredStories();
+      setInterval(cleanUpExpiredStories, 60 * 60 * 1000);
+      </script>
+</body>
+</html>

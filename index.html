@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" id="htmlElement">
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>صالون الحلاقة - قصات شعر و تصفيف احترافي</title>
+  <link rel="stylesheet" href="Styles.css">
+  
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+  <!-- Header Section -->
+  <header class="header">
+    <div class="container">
+      <div class="header-content">
+        <div class="logo">
+          <h1 data-i18n="salon_name">صالون<span data-i18n="salon_highlight"> الحلاقة</span></h1>
+        </div>
+        <nav class="nav">
+          <ul class="nav-list">
+            <li class="nav-item"><a href="#home" class="nav-link active" data-i18n="home">الرئيسية</a></li>
+            <li class="nav-item"><a href="#services" class="nav-link" data-i18n="services">الخدمات</a></li>
+            <li class="nav-item"><a href="#contact" class="nav-link" data-i18n="contact">اتصل بنا</a></li>
+            <li class="nav-item">
+              <a href="#" class="nav-link language-link" id="languageToggle">
+                <span data-i18n="language">FR</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+        <div class="book-btn">
+          <a href="#book" class="btn btn-primary" data-i18n="book_appointment">احجز موعد</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section id="home" class="hero">
+    <div class="hero-content">
+      <h1 class="hero-title" data-i18n="hero_title">قصات شعر متميزة  </h1>
+      <p class="hero-subtitle" data-i18n="hero_subtitle">استمتع بأفضل خدمات الحلاقة</p>
+      <div class="hero-buttons">
+        <a href="#book" class="btn btn-primary" data-i18n="book_now">احجز الآن</a>
+        <a href="#services" class="btn btn-secondary" data-i18n="our_services">خدماتنا</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Booking Section -->
+  <section id="book" class="booking">
+    <div class="container">
+      <h2 class="section-title centered" data-i18n="book_appointment_title">احجز موعدك الآن</h2>
+      <div class="section-divider centered"></div>
+      <p class="section-description" data-i18n="book_appointment_description">اختر التاريخ والوقت المفضل لديك للحلاقة </p>
+      <div class="booking-content"> 
+        <div class="form-group">
+          <label for="date" data-i18n="choose_date">اختر التاريخ</label>
+          <input type="date" id="date" name="date" class="form-control">
+        </div>
+        <div class="form-group">
+          <label for="time" data-i18n="choose_time">اختر الوقت</label>
+          <select id="time" name="time" class="form-control">
+            <option value="" data-i18n="choose_time_placeholder">اختر الوقت...</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group half">
+            <label for="firstName" data-i18n="first_name">الاسم الأول</label>
+            <input type="text" id="firstName" name="firstName" class="form-control" required>
+          </div>
+          <div class="form-group half">
+            <label for="lastName" data-i18n="last_name">اسم العائلة</label>
+            <input type="text" id="lastName" name="lastName" class="form-control" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <button type="button" id="bookButton" class="btn btn-primary btn-block" data-i18n="book_now_button">احجز الآن</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast" style="display: none;">
+    <i class="fas fa-check-circle toast-icon"></i>
+    <span id="toastMessage"></span>
+    <button class="toast-close">&times;</button>
+  </div>
+
+  <!-- Footer Section -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-logo">
+          <h2 data-i18n="salon_name">Barberly<span data-i18n="salon_highlight"> Barberly Shop</span></h2>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      // Language support
+      const translations = {
+        en: {}, // We'll only use Arabic and French in this example
+        ar: {
+          "salon_name": "Barberly",
+          "salon_highlight": "Barberly Shop",
+          "home": "الرئيسية",
+          "services": "الخدمات",
+          "contact": "اتصل بنا",
+          "book_appointment": "احجز موعد",
+          "language": "FR",
+          "hero_title": "قصات شعر متميزة  ",
+          "hero_subtitle": "استمتع بأفضل خدمات الحلاقة ",
+          "book_now": "احجز الآن",
+          "our_services": "خدماتنا",
+          "book_appointment_title": "احجز موعدك الآن",
+          "book_appointment_description": "اختر التاريخ والوقت المفضل لديك لحلاقة مثالية",
+          "choose_date": "اختر التاريخ",
+          "choose_time": "اختر الوقت",
+          "choose_time_placeholder": "اختر الوقت...",
+          "first_name": "الاسم الأول",
+          "last_name": "اسم العائلة",
+          "book_now_button": "احجز الآن",
+          "appointment_success": "تم حجز الموعد بنجاح!",
+          "fill_all_fields": "الرجاء ملء جميع الفراغات",
+          "time_booked": "هذا الموعد محجوز بالفعل. الرجاء اختيار وقت آخر",
+          "max_appointments": "يمكنك حجز 3 مواعيد كحد أقصى في اليوم",
+          "no_working_hours": "لا توجد ساعات عمل محددة لهذا التاريخ",
+          "no_available_slots": "لا توجد مواعيد متاحة لهذا التاريخ"
+        },
+        fr: {
+          "salon_name": "Barberly",
+          "salon_highlight": " Barberly Shop ",
+          "home": "Accueil",
+          "services": "Services",
+          "contact": "Contact",
+          "book_appointment": "Réserver",
+          "language": "AR",
+          "hero_title": "Coupes de cheveux exceptionnelles",
+          "hero_subtitle": "Profitez des meilleurs services de coiffure ",
+          "book_now": "Réserver maintenant",
+          "our_services": "Nos services",
+          "book_appointment_title": "Réservez votre rendez-vous",
+          "book_appointment_description": "Choisissez la date et l'heure qui vous conviennent pour une coupe parfaite",
+          "choose_date": "Choisissez la date",
+          "choose_time": "Choisissez l'heure",
+          "choose_time_placeholder": "Choisissez l'heure...",
+          "first_name": "Prénom",
+          "last_name": "Nom de famille",
+          "book_now_button": "Réserver maintenant",
+          "appointment_success": "Rendez-vous réservé avec succès!",
+          "fill_all_fields": "Veuillez remplir tous les champs",
+          "time_booked": "Ce créneau est déjà réservé. Veuillez choisir un autre horaire",
+          "max_appointments": "Vous ne pouvez réserver que 3 rendez-vous maximum par jour",
+          "no_working_hours": "Aucun horaire de travail défini pour cette date",
+          "no_available_slots": "Aucun rendez-vous disponible pour cette date"
+        }
+      };
+
+// Initialize language from localStorage or default to Arabic
+let currentLanguage = localStorage.getItem('userLang') || 'ar';
+
+function updateLanguage() {
+  // Update HTML direction and lang attribute
+  const htmlElement = document.getElementById('htmlElement');
+  if (currentLanguage === 'ar') {
+    htmlElement.setAttribute('dir', 'rtl');
+    htmlElement.setAttribute('lang', 'ar');
+  } else {
+    htmlElement.setAttribute('dir', 'ltr');
+    htmlElement.setAttribute('lang', 'fr');
+  }
+
+  // Update all elements with data-i18n attribute
+  document.querySelectorAll('[data-i18n]').forEach(element => {
+    const key = element.getAttribute('data-i18n');
+    if (translations[currentLanguage][key]) {
+      element.textContent = translations[currentLanguage][key];
+    }
+  });
+
+  // Save language preference to localStorage
+  localStorage.setItem('userLang', currentLanguage);
+}
+
+// Language toggle functionality
+document.getElementById('languageToggle').addEventListener('click', function(e) {
+  e.preventDefault();
+  currentLanguage = currentLanguage === 'ar' ? 'fr' : 'ar';
+  updateLanguage();
+});
+
+// Initialize language on page load
+updateLanguage();
+      // Initialize Firebase
+      const firebaseConfig = {
+        apiKey: "AIzaSyDybRqjXB0GeXbhBhk_TUryxRku0ZsT78Q",
+        authDomain: "barber-ftw.firebaseapp.com",
+        databaseURL: "https://barber-ftw-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "barber-ftw",
+        storageBucket: "barber-ftw.firebasestorage.app",
+        messagingSenderId: "340946820967",
+        appId: "1:340946820967:web:d8b130c852efd5eb0559c2"
+      };
+
+      // Initialize Firebase
+      const app = firebase.initializeApp(firebaseConfig);
+      const database = firebase.database();
+      const appointmentsRef = database.ref('appointments');
+      const workingHoursRef = database.ref('workingHours');
+      const breakTimesRef = database.ref('breakTimes');
+
+      // Set min and max date for the booking input (today + 4 days)
+      let today = new Date();
+      let year = today.getFullYear();
+      let month = (today.getMonth() + 1).toString().padStart(2, '0');
+      let day = today.getDate().toString().padStart(2, '0');
+      let currentDate = `${year}-${month}-${day}`;
+
+      let maxDate = new Date();
+      maxDate.setDate(today.getDate() + 4);
+      let maxYear = maxDate.getFullYear();
+      let maxMonth = (maxDate.getMonth() + 1).toString().padStart(2, '0');
+      let maxDay = maxDate.getDate().toString().padStart(2, '0');
+      let maxDateStr = `${maxYear}-${maxMonth}-${maxDay}`;
+
+      let dateInput = document.getElementById("date");
+      dateInput.min = currentDate;
+      dateInput.max = maxDateStr;
+
+      // Prevent manual input in date field
+      dateInput.addEventListener('keydown', (e) => {
+        e.preventDefault();
+        return false;
+      });
+
+      // Make the calendar picker cover the entire input
+      dateInput.addEventListener('focus', function() {
+        this.showPicker();
+      });
+
+      // Generate all possible time slots in 15-minute intervals
+      function generateTimeSlots(startHour = 8, endHour = 23) {
+        const slots = [];
+        for (let hour = startHour; hour <= endHour; hour++) {
+          for (let minute = 0; minute < 60; minute += 15) {
+            const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+            slots.push(time);
+          }
+        }
+        return slots;
+      }
+
+      const allTimeSlots = generateTimeSlots(8, 23);
+
+      // Function to show toast notification
+      function showToast(message, type = 'info', duration = 3000) {
+        const toast = document.getElementById('toast');
+        const toastMessage = document.getElementById('toastMessage');
+        const toastIcon = toast.querySelector('.toast-icon');
+        
+        // Set icon based on type
+        let iconClass;
+        switch(type) {
+          case 'success':
+            iconClass = 'fa-check-circle';
+            break;
+          case 'error':
+            iconClass = 'fa-exclamation-circle';
+            break;
+          case 'info':
+            iconClass = 'fa-info-circle';
+            break;
+          default:
+            iconClass = 'fa-info-circle';
+        }
+        
+        // Update icon
+        toastIcon.className = `fas ${iconClass} toast-icon`;
+        
+        toast.className = `toast ${type}`;
+        toastMessage.textContent = message;
+        toast.style.display = 'flex';
+        
+        setTimeout(() => {
+          toast.classList.add('show');
+        }, 10);
+        
+        setTimeout(() => {
+          toast.classList.remove('show');
+          setTimeout(() => {
+            toast.style.display = 'none';
+          }, 300);
+        }, duration);
+        
+        // Close button
+        document.querySelector('.toast-close').onclick = () => {
+          toast.classList.remove('show');
+          setTimeout(() => {
+            toast.style.display = 'none';
+          }, 300);
+        };
+      }
+
+      // Function to get working hours and break times for a specific date
+      async function getWorkingHours(date) {
+        try {
+          const [workingHoursSnapshot, breakTimesSnapshot] = await Promise.all([
+            workingHoursRef.child(date).once('value'),
+            breakTimesRef.orderByChild('date').equalTo(date).once('value')
+          ]);
+
+          const workingHours = workingHoursSnapshot.val();
+          const breakTimes = breakTimesSnapshot.val();
+
+          return {
+            workingHours,
+            breakTimes: breakTimes ? Object.values(breakTimes) : []
+          };
+        } catch (error) {
+          console.error("Error fetching working hours:", error);
+          return {
+            workingHours: null,
+            breakTimes: []
+          };
+        }
+      }
+
+      // Function to filter available time slots based on working hours and break times
+      function filterAvailableSlots(slots, workingHours, breakTimes, appointments) {
+        if (!workingHours) {
+          return []; // No working hours defined for this date
+        }
+
+        const { workStartTime, workEndTime } = workingHours;
+        const startTime = convertToMinutes(workStartTime);
+        const endTime = convertToMinutes(workEndTime);
+
+        // Filter slots within working hours
+        let availableSlots = slots.filter(slot => {
+          const slotTime = convertToMinutes(slot);
+          return slotTime >= startTime && slotTime <= endTime;
+        });
+
+        // Remove break times
+        breakTimes.forEach(breakTime => {
+          const breakStart = convertToMinutes(breakTime.breakStartTime);
+          const breakEnd = convertToMinutes(breakTime.breakEndTime);
+          
+          availableSlots = availableSlots.filter(slot => {
+            const slotTime = convertToMinutes(slot);
+            return slotTime < breakStart || slotTime >= breakEnd;
+          });
+        });
+
+        // Remove booked appointments
+        Object.values(appointments || {}).forEach(appointment => {
+          const [date, time] = appointment.appointmentTime.split(' ');
+          availableSlots = availableSlots.filter(slot => slot !== time);
+        });
+
+        // Remove past times for current date
+        if (dateInput.value === currentDate) {
+          const currentTime = today.getHours() * 60 + today.getMinutes();
+          availableSlots = availableSlots.filter(slot => {
+            const slotTime = convertToMinutes(slot);
+            return slotTime > currentTime;
+          });
+        }
+
+        return availableSlots;
+      }
+
+      // Helper function to convert time string to minutes
+      function convertToMinutes(timeStr) {
+        const [hours, minutes] = timeStr.split(':').map(Number);
+        return hours * 60 + minutes;
+      }
+
+      // Function to format time with AM/PM
+      function formatTime(time) {
+        if (!time) return '';
+        const [hour, minute] = time.split(':');
+        const hourNum = parseInt(hour);
+        const ampm = hourNum >= 12 ? 'PM' : 'AM';
+        const displayHour = hourNum % 12 || 12;
+        return `${displayHour}:${minute} ${ampm}`;
+      }
+
+      // Display available time slots for selected date
+      async function displayAvailableSlots(date) {
+        const timeSelect = document.getElementById("time");
+        timeSelect.innerHTML = "";
+        let placeholderOption = document.createElement("option");
+        placeholderOption.value = "";
+        placeholderOption.textContent = currentLanguage === 'ar' ? "اختر الوقت..." : "Choisissez l'heure...";
+        timeSelect.appendChild(placeholderOption);
+
+        try {
+          // Get appointments for the selected date
+          const appointmentsSnapshot = await appointmentsRef.child(date).once('value');
+          const appointments = appointmentsSnapshot.val();
+
+          // Get working hours and break times
+          const { workingHours, breakTimes } = await getWorkingHours(date);
+
+          if (!workingHours) {
+            showToast(
+              translations[currentLanguage]['no_working_hours'],
+              'error'
+            );
+            return;
+          }
+
+          // Filter available slots
+          const availableSlots = filterAvailableSlots(
+            allTimeSlots,
+            workingHours,
+            breakTimes,
+            appointments
+          );
+
+          // Populate the time select dropdown
+          availableSlots.forEach(slot => {
+            let option = document.createElement("option");
+            option.value = slot;
+            option.textContent = formatTime(slot);
+            timeSelect.appendChild(option);
+          });
+
+          if (availableSlots.length === 0) {
+            showToast(
+              translations[currentLanguage]['no_available_slots'],
+              'info'
+            );
+          }
+        } catch (error) {
+          console.error("Error displaying available slots:", error);
+          showToast(
+            currentLanguage === 'ar' ? "حدث خطأ أثناء جلب المواعيد المتاحة" : "Error fetching available appointments",
+            'error'
+          );
+        }
+      }
+
+      // Handle date selection change
+      dateInput.addEventListener("change", (event) => {
+        const selectedDate = event.target.value;
+        if (selectedDate) {
+          displayAvailableSlots(selectedDate);
+        }
+      });
+
+      // Book appointment functionality
+      const bookButton = document.getElementById("bookButton");
+      let isBookingInProgress = false;
+
+      bookButton.addEventListener("click", async () => {
+        const selectedDate = dateInput.value;
+        const selectedTime = document.getElementById("time").value;
+        const firstName = document.getElementById("firstName").value.trim();
+        const lastName = document.getElementById("lastName").value.trim();
+
+        if (!selectedDate || !selectedTime || !firstName || !lastName) {
+          showToast(
+            translations[currentLanguage]['fill_all_fields'],
+            'error'
+          );
+          return;
+        }
+
+        if (isBookingInProgress) return;
+        isBookingInProgress = true;
+        bookButton.disabled = true;
+        bookButton.textContent = currentLanguage === 'ar' ? 'جاري الحجز...' : 'Réservation en cours...';
+
+        try {
+          // Check if user already has 3 appointments for this date
+          const appointmentsSnapshot = await appointmentsRef.child(selectedDate).once('value');
+          const appointments = appointmentsSnapshot.val();
+          
+          let userAppointments = 0;
+          if (appointments) {
+            userAppointments = Object.values(appointments).filter(
+              appointment => appointment.fullName === `${firstName} ${lastName}`
+            ).length;
+          }
+
+          if (userAppointments >= 3) {
+            showToast(
+              translations[currentLanguage]['max_appointments'],
+              'error'
+            );
+            return;
+          }
+
+          // Check if time is already booked
+          let timeBooked = false;
+          if (appointments) {
+            timeBooked = Object.values(appointments).some(
+              appointment => appointment.appointmentTime === `${selectedDate} ${selectedTime}`
+            );
+          }
+
+          if (timeBooked) {
+            showToast(
+              translations[currentLanguage]['time_booked'],
+              'error'
+            );
+            return;
+          }
+
+          // Create new appointment
+          const newAppointmentRef = appointmentsRef.child(selectedDate).push();
+          const appointmentId = newAppointmentRef.key;
+          
+          const appointmentData = {
+            fullName: `${firstName} ${lastName}`,
+            appointmentTime: `${selectedDate} ${selectedTime}`,
+            status: "booked",
+            timestamp: firebase.database.ServerValue.TIMESTAMP
+          };
+
+          await newAppointmentRef.set(appointmentData);
+
+          showToast(
+            translations[currentLanguage]['appointment_success'],
+            'success',
+            5000
+          );
+
+          // Refresh available slots
+          displayAvailableSlots(selectedDate);
+
+          // Clear form
+          document.getElementById("firstName").value = "";
+          document.getElementById("lastName").value = "";
+        } catch (error) {
+          console.error("Error booking appointment:", error);
+          showToast(
+            currentLanguage === 'ar' ? "حدث خطأ أثناء حجز الموعد" : "Error booking appointment",
+            'error'
+          );
+        } finally {
+          isBookingInProgress = false;
+          bookButton.disabled = false;
+          bookButton.textContent = translations[currentLanguage]['book_now_button'];
+        }
+      });
+    });
+    
+  </script>
+</body>
+</html>
